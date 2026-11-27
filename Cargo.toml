@@ -8,7 +8,7 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/{{github_user}}/{{project-name}}"
 categories = ["command-line-utilities"]
 keywords = ["cli"]
-exclude = [".github/", ".gitignore", "justfile", "clippy.toml", "mise.toml", "mise.lock", "tests/"]
+exclude = [".github/", ".gitignore", "justfile", "clippy.toml", "cliff.toml", "mise.toml", "mise.lock", "tests/"]
 
 [dependencies]
 clap = { version = "4.6", features = ["derive"] }

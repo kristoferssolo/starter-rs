@@ -1,0 +1,42 @@
+# https://git-cliff.org/docs/configuration
+# Groups sort by the leading HTML comment, which `striptags` removes from headings
+
+[changelog]
+header = """
+# Changelog\n
+"""
+body = """
+{% if version -%}
+    ## {{ version | trim_start_matches(pat="v") }} - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else -%}
+    ## Unreleased
+{% endif -%}
+{% for group, commits in commits | group_by(attribute="group") %}
+    ### {{ group | striptags | trim }}
+    {% for commit in commits %}
+        - {% if commit.scope %}**{{ commit.scope }}:** {% endif %}\
+            {{ commit.message | upper_first }}\
+    {% endfor %}
+{% endfor %}\n
+"""
+trim = true
+
+[git]
+conventional_commits = true
+filter_unconventional = false
+commit_parsers = [
+    # First, so breaking commits are never skipped
+    { field = "breaking", pattern = "true", group = "<!-- 0 -->Breaking changes" },
+    { message = "^feat", group = "<!-- 1 -->Features" },
+    { message = "^fix", group = "<!-- 2 -->Bug fixes" },
+    { message = "^perf", group = "<!-- 3 -->Performance" },
+    { message = "^refactor", group = "<!-- 4 -->Refactoring" },
+    { message = "^docs", group = "<!-- 5 -->Documentation" },
+    { message = "^revert", group = "<!-- 6 -->Reverts" },
+    { message = "^build", group = "<!-- 7 -->Build" },
+    { message = "^(chore|ci|style|test)", skip = true },
+    { message = ".*", group = "<!-- 8 -->Other" },
+]
+# Matches the tags that publish.yml releases
+tag_pattern = "^v[0-9]+\\.[0-9]+\\.[0-9]+$"
+sort_commits = "oldest"

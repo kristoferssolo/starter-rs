@@ -10,7 +10,9 @@ for Rust CLI crates. It provides:
 - a justfile whose `just check` matches CI
 - CI for formatting, Clippy, nextest, docs, and `cargo audit`
 - a tag-driven release that builds Linux and macOS binaries, publishes to
-  crates.io through trusted publishing, and creates a GitHub release
+  crates.io through trusted publishing, and creates a GitHub release with
+  notes from git-cliff
+- a git-cliff config that builds `CHANGELOG.md` from Conventional Commits
 
 ## Usage
 
@@ -31,13 +33,15 @@ fails without it.
 
 1. Configure trusted publishing for the crate on crates.io, pointing at
    `publish.yml`.
-2. Bump `version` in `Cargo.toml`, commit, and push a matching `vX.Y.Z` tag.
+2. Bump `version` in `Cargo.toml`, run `just changelog --tag vX.Y.Z`, commit,
+   and push a matching `vX.Y.Z` tag.
 
 ## Developing the template
 
 Only the files listed in `include` in `cargo-generate.toml` go through Liquid.
-The justfile and workflows use `{{ }}` for their own syntax, so keep Liquid out
-of them; `publish.yml` reads the crate name from `cargo metadata` instead.
+The justfile, workflows, and `cliff.toml` use `{{ }}` for their own syntax, so
+keep Liquid out of them; `publish.yml` reads the crate name from
+`cargo metadata` instead.
 
 The `Template` workflow generates a project and runs its `just check`. The CI
 and release jobs skip themselves while the repository is marked as a GitHub

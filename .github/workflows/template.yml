@@ -1,0 +1,51 @@
+name: Template
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: template-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  generate:
+    name: Generate and check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          path: template
+      - name: Install cargo-generate
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-generate@0.26.0
+      - name: Generate project from template
+        run: >-
+          cargo generate --path template --name smoke-test --silent --vcs none
+          --define 'authors=Template CI <ci@example.com>'
+          --define 'description=Template smoke test'
+          --define 'github_user=example'
+      - name: Install Rust toolchain from rust-toolchain.toml
+        working-directory: smoke-test
+        run: rustup toolchain install
+      - name: Install just and nextest
+        uses: jdx/mise-action@v5
+        with:
+          version: 2026.11.14
+          working_directory: smoke-test
+          install_args: --locked just cargo-nextest
+      - name: Populate target directory from cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: smoke-test
+      - name: Generate Cargo.lock
+        working-directory: smoke-test
+        run: cargo generate-lockfile
+      - name: Run just check
+        working-directory: smoke-test
+        run: just check

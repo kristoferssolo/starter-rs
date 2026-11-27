@@ -1,0 +1,11 @@
+[template]
+cargo_generate_version = ">=0.26.0"
+# Only these files go through Liquid. The justfile and workflows use `{{ }}`
+# for their own syntax, so they are copied verbatim
+include = ["Cargo.toml", "README.md", "LICENSE-MIT", "src/main.rs"]
+# Template-only files that generated projects do not need
+ignore = [".github/README.md", ".github/workflows/template.yml"]
+
+[placeholders]
+description = { type = "string", prompt = "One-line crate description" }
+github_user = { type = "string", prompt = "GitHub user or organization", default = "kristoferssolo" }
